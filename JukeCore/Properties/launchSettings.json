@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "JukeCore": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Users\\Marcel Neumann\\Desktop\\media\""
+    }
+  }
+}
