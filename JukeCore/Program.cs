@@ -13,7 +13,6 @@ namespace JukeCore
     {
         private static Playlist _playlist;
         private static MediaPlayerWrapper _mediaPlayer;
-        private static Current _current;
         private static ConsoleWrapper _console;
 
         public static async Task Main(string[] args)
@@ -34,10 +33,9 @@ namespace JukeCore
                 using var libVlc = new LibVLC();
                 _mediaPlayer = new MediaPlayerWrapper(new MediaPlayer(libVlc), _console);
                 var mediaFactory = new MediaFactory(libVlc);
-                _current = new Current();
                 _playlist = new Playlist(_console);
                 var commandFactory =
-                    new CommandFactory(_mediaPlayer, mediaFactory, fileSystem.Directory, _current, _playlist,
+                    new CommandFactory(_mediaPlayer, mediaFactory, fileSystem.Directory, _playlist,
                         fileSystem.Path, _console);
                 var processor = new IdProcessor(commandFactory, _console);
                 var mainLoop = new MainLoop(_console, processor);
@@ -79,7 +77,6 @@ namespace JukeCore
             }
 
             _console.WriteLine("Nothing left to play.");
-            _current.Id = null;
         }
     }
 }

@@ -13,18 +13,16 @@ namespace JukeCore
         private readonly IMediaPlayer _mediaPlayer;
         private readonly IMediaFactory _mediaFactory;
         private readonly IDirectory _directory;
-        private readonly ICurrent _current;
         private readonly IPlaylist _playlist;
         private readonly IPath _path;
         private readonly IConsole _console;
 
         public CommandFactory(IMediaPlayer mediaPlayer, IMediaFactory mediaFactory, IDirectory directory,
-            ICurrent current, IPlaylist playlist, IPath path, IConsole console)
+            IPlaylist playlist, IPath path, IConsole console)
         {
             _mediaPlayer = mediaPlayer;
             _mediaFactory = mediaFactory;
             _directory = directory;
-            _current = current;
             _playlist = playlist;
             _path = path;
             _console = console;
@@ -45,7 +43,7 @@ namespace JukeCore
             _console.WriteLine($"Found mapping: {value}");
 
             var medias = CreateMediasFromDirectory(value, jukeCorePath);
-            return new PlayCommand(value, medias, _mediaPlayer, _current, _playlist, _console);
+            return new PlayCommand(value, medias, _mediaPlayer, _playlist, _console);
         }
 
         private IReadOnlyList<Media> CreateMediasFromDirectory(string id, string path)
