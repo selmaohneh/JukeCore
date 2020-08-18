@@ -1,9 +1,10 @@
-﻿using LibVLCSharp.Shared;
+﻿using System.Collections.Generic;
+using LibVLCSharp.Shared;
 
 namespace JukeCore
 {
     public interface IMediaFactory
     {
-        Media CreateFromPath(string path);
+        IReadOnlyList<Media> Create(string id, string jukeCorePath);
     }
 }

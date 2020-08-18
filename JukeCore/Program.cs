@@ -32,12 +32,11 @@ namespace JukeCore
                 var fileSystem = new FileSystem();
                 using var libVlc = new LibVLC();
                 _mediaPlayer = new MediaPlayerWrapper(new MediaPlayer(libVlc), _console);
-                var mediaFactory = new MediaFactory(libVlc);
                 _playlist = new Playlist(_console);
                 var commandFactory =
-                    new CommandFactory(_mediaPlayer, mediaFactory, fileSystem.Directory, _playlist,
-                        fileSystem.Path, _console);
-                var processor = new IdProcessor(commandFactory, _console);
+                    new MediaFactory(fileSystem.Directory,
+                        fileSystem.Path, _console, libVlc);
+                var processor = new IdProcessor(commandFactory, _console, _playlist, _mediaPlayer);
                 var mainLoop = new MainLoop(_console, processor);
 
                 var driver = new SysFsDriver();
