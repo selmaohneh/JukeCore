@@ -30,8 +30,8 @@ namespace JukeCore
                 _console.WriteLine("Creating app registry ... ");
                 var fileSystem = new FileSystem();
                 using var libVlc = new LibVLC();
-                _mediaPlayer = new MediaPlayerWrapper(new MediaPlayer(libVlc), _console, _playlist);
                 _playlist = new Playlist(_console);
+                _mediaPlayer = new MediaPlayerWrapper(new MediaPlayer(libVlc), _console, _playlist);
                 var commandFactory =
                     new MediaFactory(fileSystem.Directory,
                         fileSystem.Path, _console, libVlc);
