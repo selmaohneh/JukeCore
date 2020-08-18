@@ -34,6 +34,7 @@ namespace JukeCore
                     await Task.Delay(50);
                 }
             }
+            // ReSharper disable once FunctionNeverReturns
         }
     }
 }

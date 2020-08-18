@@ -16,7 +16,7 @@ namespace JukeCore
             Pressed += OnPressed;
         }
 
-        private void OnPressed(object? sender, EventArgs e)
+        private void OnPressed(object sender, EventArgs e)
         {
             try
             {

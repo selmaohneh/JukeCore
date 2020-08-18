@@ -18,13 +18,14 @@ namespace JukeCore
 
         public void Set(IEnumerable<Media> medias)
         {
-            _console.WriteLine($"Setting {medias.Count()} tracks as new playlist.");
+            var mediaList = medias.ToList();
+            _console.WriteLine($"Setting {mediaList.Count} tracks as new playlist.");
             foreach (var media in _medias)
             {
                 media.Dispose();
             }
 
-            _medias = new List<Media>(medias);
+            _medias = new List<Media>(mediaList);
             _currentTrack = 0;
         }
 
