@@ -9,6 +9,5 @@ namespace JukeCore
         void Pause();
         event EventHandler<EventArgs> Stopped;
         int Volume { get; set; }
-        bool IsPlaying { get; }
     }
 }

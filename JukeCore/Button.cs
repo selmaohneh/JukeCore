@@ -23,7 +23,7 @@ namespace JukeCore
                 _console.WriteLine($"Opening GPIO {gpioNumber} ...");
                 _gpioController.OpenPin(gpioNumber);
                 _console.WriteLine(
-                    $"GPIP {gpioNumber} was opened! Initial value: {_gpioController.Read(gpioNumber).ToString()}");
+                    $"GPIO {gpioNumber} was opened! Initial value: {_gpioController.Read(gpioNumber).ToString()}");
             }
             catch (Exception e)
             {
