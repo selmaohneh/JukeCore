@@ -3,7 +3,6 @@ using System.Device.Gpio;
 using System.Device.Gpio.Drivers;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using LibVLCSharp.Shared;
 
@@ -31,7 +30,7 @@ namespace JukeCore
                 _console.WriteLine("Creating app registry ... ");
                 var fileSystem = new FileSystem();
                 using var libVlc = new LibVLC();
-                _mediaPlayer = new MediaPlayerWrapper(new MediaPlayer(libVlc), _console);
+                _mediaPlayer = new MediaPlayerWrapper(new MediaPlayer(libVlc), _console, _playlist);
                 _playlist = new Playlist(_console);
                 var commandFactory =
                     new MediaFactory(fileSystem.Directory,
@@ -47,8 +46,6 @@ namespace JukeCore
                 var nextButton = new NextButton(controller, _mediaPlayer, _playlist, _console);
                 var playPlauseButton = new PlayPauseButton(controller, _mediaPlayer, _console);
 
-                _mediaPlayer.Stopped += OnStopped;
-
 #pragma warning disable 4014
                 volDownButton.Activate(4);
                 volUpButton.Activate(17);
@@ -63,19 +60,6 @@ namespace JukeCore
             {
                 _console.WriteLine(e.Message);
             }
-        }
-
-        private static void OnStopped(object sender, EventArgs e)
-        {
-            _console.WriteLine("Reached end of track.");
-            if (_playlist.AnyNext())
-            {
-                var nextMedia = _playlist.Next();
-                ThreadPool.QueueUserWorkItem(_ => _mediaPlayer.Play(nextMedia));
-                return;
-            }
-
-            _console.WriteLine("Nothing left to play.");
         }
     }
 }

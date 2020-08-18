@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using LibVLCSharp.Shared;
 
 namespace JukeCore
@@ -7,15 +8,13 @@ namespace JukeCore
     {
         private readonly MediaPlayer _mediaPlayer;
         private readonly IConsole _console;
+        private readonly Playlist _playlist;
 
-        public bool IsPlaying => _mediaPlayer.IsPlaying;
-
-        public event EventHandler<EventArgs> Stopped;
-
-        public MediaPlayerWrapper(MediaPlayer mediaPlayer, IConsole console)
+        public MediaPlayerWrapper(MediaPlayer mediaPlayer, IConsole console, Playlist playlist)
         {
             _mediaPlayer = mediaPlayer;
             _console = console;
+            _playlist = playlist;
             _mediaPlayer.Volume = 50;
             _mediaPlayer.EndReached += OnStopped;
         }
@@ -47,10 +46,17 @@ namespace JukeCore
             }
         }
 
-        private void OnStopped(object? sender, EventArgs e)
+        private void OnStopped(object sender, EventArgs e)
         {
-            _console.WriteLine("Media player stopped!");
-            Stopped?.Invoke(this, e);
+            _console.WriteLine("Reached end of track.");
+            if (_playlist.AnyNext())
+            {
+                var nextMedia = _playlist.Next();
+                ThreadPool.QueueUserWorkItem(_ => _mediaPlayer.Play(nextMedia));
+                return;
+            }
+
+            _console.WriteLine("Nothing left to play.");
         }
 
         public void Pause()

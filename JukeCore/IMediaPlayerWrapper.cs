@@ -1,5 +1,4 @@
-﻿using System;
-using LibVLCSharp.Shared;
+﻿using LibVLCSharp.Shared;
 
 namespace JukeCore
 {
@@ -7,7 +6,6 @@ namespace JukeCore
     {
         bool Play(Media media);
         void Pause();
-        event EventHandler<EventArgs> Stopped;
         int Volume { get; set; }
     }
 }
