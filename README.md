@@ -30,5 +30,5 @@ included files as playlist. All the media-handling is based on [libvlcsharp](htt
 
 ## Contributing
 
-* Just pick [an existing issue or file your own](https://github.com/selmaohneh/ImageQuiz/issues).
+* Just pick [an existing issue or file your own](hhttps://github.com/selmaohneh/JukeCore/issues).
 * [Kaffee? :-)](https://www.buymeacoffee.com/SaMAsU1N6)
