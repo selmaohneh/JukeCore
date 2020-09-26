@@ -20,7 +20,7 @@ namespace JukeCore
         {
             try
             {
-                _console.WriteLine($"Opening GPIO {gpioNumber} ...");
+                _console.WriteLine($"Opening GPIO {gpioNumber} for {GetType().Name}...");
                 _gpioController.OpenPin(gpioNumber);
                 _console.WriteLine(
                     $"GPIO {gpioNumber} was opened! Initial value: {_gpioController.Read(gpioNumber).ToString()}");
