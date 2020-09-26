@@ -33,7 +33,7 @@ namespace JukeCore
             GpioDriver driver;
             if (isWindows)
             {
-                driver = new GpioSimulator(_functionKeyEvents, _console);
+                driver = new FunctionKeysGpioDriver(_functionKeyEvents, _console);
             }
             else
             {

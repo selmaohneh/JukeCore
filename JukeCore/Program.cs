@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Device.Gpio;
-using System.Device.Gpio.Drivers;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
@@ -38,7 +37,8 @@ namespace JukeCore
                 var processor = new IdProcessor(commandFactory, _console, _playlist, _mediaPlayer);
                 var mainLoop = new MainLoop(_console, processor);
 
-                var driver = new SysFsDriver();
+                var gpioDriverFactory = new GpioDriverFactory(_console, _console);
+                var driver = gpioDriverFactory.Create();
                 var controller = new GpioController(PinNumberingScheme.Logical, driver);
                 var volDownButton = new VolumeDownButton(controller, _mediaPlayer, _console);
                 var volUpButton = new VolumeUpButton(controller, _mediaPlayer, _console);
