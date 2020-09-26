@@ -18,7 +18,7 @@ namespace JukeCore
 
         private void OnPressed(object sender, EventArgs e)
         {
-            _console.WriteLine("Volume down button was pressed!");
+            _console.WriteLine("Volume up button was pressed!");
             _mediaPlayer.Volume += 5;
         }
     }
