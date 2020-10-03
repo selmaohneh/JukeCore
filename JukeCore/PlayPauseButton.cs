@@ -7,12 +7,14 @@ namespace JukeCore
     {
         private readonly IMediaPlayer _mediaPlayer;
         private readonly IConsole _console;
+        private readonly JukeCoreDataModel _dataModel;
 
-        public PlayPauseButton(GpioController gpioController, IMediaPlayer mediaPlayer, IConsole console) : base(
+        public PlayPauseButton(GpioController gpioController, IMediaPlayer mediaPlayer, IConsole console, JukeCoreDataModel dataModel) : base(
             gpioController, console)
         {
             _mediaPlayer = mediaPlayer;
             _console = console;
+            _dataModel = dataModel;
             Pressed += OnPressed;
         }
 
@@ -27,6 +29,11 @@ namespace JukeCore
             {
                 _console.WriteLine(exception.Message);
             }
+        }
+
+        protected override void SetButtonStateInDataModel(EButtonState buttonState)
+        {
+            _dataModel.PlayPauseButtonState = buttonState;
         }
     }
 }

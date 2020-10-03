@@ -17,6 +17,7 @@ namespace JukeCore
             _console = console;
         }
 
+        protected abstract void SetButtonStateInDataModel(EButtonState buttonState);
 
 #if USE_GPIO_POLLING
         public await Task Activate(int gpioNumber)
@@ -63,10 +64,15 @@ namespace JukeCore
         {
             if (args.ChangeType == PinEventTypes.Falling)
             {
+                SetButtonStateInDataModel(EButtonState.Pressed);
                 Pressed?.Invoke(this, EventArgs.Empty);
                 Thread.Sleep(50);
             }
 
+            if (args.ChangeType == PinEventTypes.Rising)
+            {
+                SetButtonStateInDataModel(EButtonState.Released);
+            }
         }
     }
 }

@@ -7,12 +7,14 @@ namespace JukeCore
     {
         private readonly IMediaPlayer _mediaPlayer;
         private readonly IConsole _console;
+        private readonly JukeCoreDataModel _dataModel;
 
-        public VolumeDownButton(GpioController gpioController, IMediaPlayer mediaPlayer, IConsole console) : base(
+        public VolumeDownButton(GpioController gpioController, IMediaPlayer mediaPlayer, IConsole console, JukeCoreDataModel dataModel) : base(
             gpioController, console)
         {
             _mediaPlayer = mediaPlayer;
             _console = console;
+            _dataModel = dataModel;
             Pressed += OnPressed;
         }
 
@@ -20,6 +22,11 @@ namespace JukeCore
         {
             _console.WriteLine("Volume down button was pressed!");
             _mediaPlayer.Volume -= 5;
+        }
+
+        protected override void SetButtonStateInDataModel(EButtonState buttonState)
+        {
+            _dataModel.VolumeDownButtonState = buttonState;
         }
     }
 }
