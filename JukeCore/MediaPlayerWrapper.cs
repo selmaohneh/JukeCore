@@ -9,14 +9,75 @@ namespace JukeCore
         private readonly MediaPlayer _mediaPlayer;
         private readonly IConsole _console;
         private readonly Playlist _playlist;
+        private readonly JukeCoreDataModel _dataModel;
 
-        public MediaPlayerWrapper(MediaPlayer mediaPlayer, IConsole console, Playlist playlist)
+        public MediaPlayerWrapper(MediaPlayer mediaPlayer, IConsole console, Playlist playlist, JukeCoreDataModel dataModel)
         {
             _mediaPlayer = mediaPlayer;
             _console = console;
             _playlist = playlist;
+            _dataModel = dataModel;
+            SubscribeToMediaPlayerEvents();
             _mediaPlayer.Volume = 50;
+        }
+
+        private void UpdateVolumeFromPlayer()
+        {
+            _dataModel.VolumePercent = (byte)_mediaPlayer.Volume;
+        }
+
+        private void SubscribeToMediaPlayerEvents()
+        {
             _mediaPlayer.EndReached += OnStopped;
+            _mediaPlayer.Paused += OnPlaybackStateChanged;
+            _mediaPlayer.Stopped += OnPlaybackStateChanged;
+            _mediaPlayer.Playing += OnPlaybackStateChanged;
+            _mediaPlayer.MediaChanged += OnMediaChanged;
+            _mediaPlayer.LengthChanged += OnLengthChanged;
+            _mediaPlayer.TimeChanged += OnPlaybackTimeChanged;
+            _mediaPlayer.VolumeChanged += OnVolumeChanged;
+        }
+
+        private void OnVolumeChanged(object sender, MediaPlayerVolumeChangedEventArgs e)
+        {
+            // e.Volume is float and fives inaccuracies when converted to percent - hence use the already
+            // converted volume from player here
+           UpdateVolumeFromPlayer();
+        }
+
+        private void OnPlaybackTimeChanged(object sender, MediaPlayerTimeChangedEventArgs e)
+        {
+            // throttle change to 1 per sec
+            _dataModel.MediaPositionMs = (e.Time / 1000) * 1000;
+        }
+
+        private void OnLengthChanged(object sender, MediaPlayerLengthChangedEventArgs e)
+        {
+            _dataModel.MediaDurationMs = e.Length;
+        }
+
+        private void OnMediaChanged(object sender, MediaPlayerMediaChangedEventArgs e)
+        {
+            _dataModel.MediaFilename = e.Media.Mrl;
+        }
+
+        private void OnPlaybackStateChanged(object sender, EventArgs e)
+        {
+            switch (_mediaPlayer.State)
+            {
+                case VLCState.Paused:
+                    _dataModel.PlaybackState = EPlaybackState.Paused;
+                    break;
+                case VLCState.Playing:
+                    _dataModel.PlaybackState = EPlaybackState.Playing;
+                    break;
+                default:
+                    _dataModel.PlaybackState = EPlaybackState.Stopped;
+                    _dataModel.MediaDurationMs = 0;
+                    _dataModel.MediaPositionMs = 0;
+                    _dataModel.MediaFilename = string.Empty;
+                    break;
+            }
         }
 
         public bool Play(Media media)
@@ -68,7 +129,14 @@ namespace JukeCore
         public void Dispose()
         {
             _console.WriteLine("Disposing media player ...");
-            _mediaPlayer.Stopped -= OnStopped;
+            _mediaPlayer.EndReached -= OnStopped;
+            _mediaPlayer.Stopped -= OnPlaybackStateChanged;
+            _mediaPlayer.Playing -= OnPlaybackStateChanged;
+            _mediaPlayer.Paused -= OnPlaybackStateChanged;
+            _mediaPlayer.MediaChanged -= OnMediaChanged;
+            _mediaPlayer.TimeChanged -= OnPlaybackTimeChanged;
+            _mediaPlayer.LengthChanged -= OnLengthChanged;
+            _mediaPlayer.VolumeChanged -= OnVolumeChanged;
             _mediaPlayer.Dispose();
         }
     }
