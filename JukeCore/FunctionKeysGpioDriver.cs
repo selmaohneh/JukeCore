@@ -15,6 +15,7 @@ namespace JukeCore
         private readonly IConsole _console;
         private readonly Dictionary<ConsoleKey, int> _openedPins = new Dictionary<ConsoleKey, int>();
         private readonly Dictionary<int, PinValue> _pinValues = new Dictionary<int, PinValue>();
+        private readonly Dictionary<int, PinChangeEventHandler> _registeredPinEvents = new Dictionary<int, PinChangeEventHandler>();
         private readonly List<ConsoleKey> _assignedConsoleKeys = new List<ConsoleKey>();
         private readonly PinValue _idlePinValue = PinValue.High;
 
@@ -53,13 +54,24 @@ namespace JukeCore
         {
             if (_openedPins.ContainsKey(e))
             {
-                _pinValues[_openedPins[e]] = PinValue.Low;
+                int pinNumber = _openedPins[e];
+                _pinValues[pinNumber] = PinValue.Low;
+
+#if !USE_GPIO_POLLING
+                if (_registeredPinEvents.ContainsKey(pinNumber))
+                {
+                    _registeredPinEvents[pinNumber]?.Invoke(sender, new PinValueChangedEventArgs(PinEventTypes.Falling, pinNumber));
+                    Thread.Sleep(200);
+                    _pinValues[pinNumber] = PinValue.High;
+                    _registeredPinEvents[pinNumber]?.Invoke(sender, new PinValueChangedEventArgs(PinEventTypes.Rising, pinNumber));
+                }
+#endif
             }
         }
 
         protected override void AddCallbackForPinValueChangedEvent(int pinNumber, PinEventTypes eventTypes, PinChangeEventHandler callback)
         {
-            throw new NotSupportedException("Only polling is supported on this implementation");
+            _registeredPinEvents.Add(pinNumber, callback);
         }
 
         protected override void ClosePin(int pinNumber)
@@ -100,7 +112,10 @@ namespace JukeCore
 
         protected override void RemoveCallbackForPinValueChangedEvent(int pinNumber, PinChangeEventHandler callback)
         {
-            throw new NotSupportedException("Only polling is supported on this implementation");
+            if (_registeredPinEvents.ContainsKey(pinNumber))
+            {
+                _registeredPinEvents.Remove(pinNumber);
+            }
         }
 
         protected override void SetPinMode(int pinNumber, PinMode mode)
@@ -113,7 +128,7 @@ namespace JukeCore
 
         protected override WaitForEventResult WaitForEvent(int pinNumber, PinEventTypes eventTypes, CancellationToken cancellationToken)
         {
-            throw new NotSupportedException("Only polling is supported on this implementation");
+            throw new NotSupportedException("Only polling and interrupts are supported on this implementation");
         }
 
         protected override void Write(int pinNumber, PinValue value)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 
 namespace JukeCore
 {
@@ -46,22 +47,26 @@ namespace JukeCore
             bool lineComplete = false;
             do
             {
-                var key = Console.ReadKey(true);
-
-                if (IsFunctionKey(key.Key))
+                if (Console.KeyAvailable)
                 {
-                    OnFunctionKeyPressed?.Invoke(this, key.Key);
-                    continue;
+                    var key = Console.ReadKey(true);
+
+                    if (IsFunctionKey(key.Key))
+                    {
+                        OnFunctionKeyPressed?.Invoke(this, key.Key);
+                        continue;
+                    }
+
+                    if (key.Key == ConsoleKey.Enter)
+                    {
+                        lineComplete = true;
+                    }
+
+                    Console.Write(key.KeyChar);
+                    readLine.Append(key.KeyChar);
                 }
 
-                if (key.Key == ConsoleKey.Enter)
-                {
-                    lineComplete = true;
-                }
-
-                Console.Write(key.KeyChar);
-                readLine.Append(key.KeyChar);
-
+                Thread.Sleep(100);
             } 
             while (!lineComplete);
 

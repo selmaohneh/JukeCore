@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Device.Gpio;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace JukeCore
@@ -16,7 +17,12 @@ namespace JukeCore
             _console = console;
         }
 
-        public async Task Activate(int gpioNumber)
+
+#if USE_GPIO_POLLING
+        public await Task Activate(int gpioNumber)
+#else
+        public Task Activate(int gpioNumber)
+#endif
         {
             try
             {
@@ -28,8 +34,10 @@ namespace JukeCore
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return;
+                return Task.CompletedTask;
             }
+
+#if USE_GPIO_POLLING
 
             while (true)
             {
@@ -45,6 +53,20 @@ namespace JukeCore
 
                 await Task.Delay(20);
             }
+#else
+            _gpioController.RegisterCallbackForPinValueChangedEvent(gpioNumber, PinEventTypes.Falling | PinEventTypes.Rising, OnPinLevelChanged);
+            return Task.CompletedTask;
+#endif
+        }
+
+        private void OnPinLevelChanged(object sender, PinValueChangedEventArgs args)
+        {
+            if (args.ChangeType == PinEventTypes.Falling)
+            {
+                Pressed?.Invoke(this, EventArgs.Empty);
+                Thread.Sleep(50);
+            }
+
         }
     }
 }
