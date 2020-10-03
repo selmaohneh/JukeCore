@@ -4,6 +4,7 @@ using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
 using LibVLCSharp.Shared;
+using PowerArgs;
 
 namespace JukeCore
 {
@@ -15,12 +16,25 @@ namespace JukeCore
 
         public static async Task Main(string[] args)
         {
+            CommandLineArguments arguments;
             try
             {
+               arguments = Args.Parse<CommandLineArguments>(args);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine(ArgUsage.GenerateUsageFromTemplate<CommandLineArguments>());
+                return;
+            }
+
+            try
+            {
+                
                 _console = new ConsoleWrapper();
                 _console.WriteLine("JukeCore started!");
 
-                string jukeCoreMediaPath = args.First();
+                string jukeCoreMediaPath = arguments.JukeCoreMediaPath;
                 _console.WriteLine($"Path to media folder is: '{jukeCoreMediaPath}'.");
 
                 _console.WriteLine("Initialzing LibVLC ... ");
