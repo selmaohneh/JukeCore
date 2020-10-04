@@ -9,14 +9,16 @@ namespace JukeCore
         private readonly IMediaPlayer _mediaPlayer;
         private readonly IPlaylist _playlist;
         private readonly IConsole _console;
+        private readonly JukeCoreDataModel _dataModel;
 
         public PreviousButton(GpioController gpioController, IMediaPlayer mediaPlayer, IPlaylist playlist,
-            IConsole console) : base(
+            IConsole console, JukeCoreDataModel dataModel) : base(
             gpioController, console)
         {
             _mediaPlayer = mediaPlayer;
             _playlist = playlist;
             _console = console;
+            _dataModel = dataModel;
             Pressed += OnPressed;
         }
 
@@ -33,6 +35,11 @@ namespace JukeCore
             {
                 _console.WriteLine(exception.Message);
             }
+        }
+
+        protected override void SetButtonStateInDataModel(EButtonState buttonState)
+        {
+            _dataModel.PreviousButtonState = buttonState;
         }
     }
 }
